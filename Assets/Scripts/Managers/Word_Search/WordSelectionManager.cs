@@ -8,11 +8,11 @@ public class WordSelectionManager : MonoBehaviour
     [SerializeField] private List<WordEntry> m_words = new List<WordEntry>();           // <- All the words that will be generated (includes amount of times it will be generated).
     [SerializeField] private List<WordEntry> m_debugWords = new List<WordEntry>();      // <- All the debug words that will be generated (includes amount of times it will be generated).
 
-    public int m_rows = -1;                                                     // <- Amount of rows text will be on.
-    public int m_cols = -1;                                                     // <- Amount of columns text will be on.
+    public int m_rows = -1;                                                             // <- Amount of rows text will be on.
+    public int m_cols = -1;                                                             // <- Amount of columns text will be on.
 
-    [SerializeField] private int m_minRows = 10;                                // <- Min amount of rows the game can be.
-    [SerializeField] private int m_minCols = 10;                                // <- Min amount of columns the game can be.
+    [SerializeField] private int m_minRows = 10;                                        // <- Min amount of rows the game can be.
+    [SerializeField] private int m_minCols = 10;                                        // <- Min amount of columns the game can be.
 
     [SerializeField] private WordSearchGenerator    m_generatorPrefab;
     [SerializeField] private WordSearchTitle        m_wordSearchTitlePrefab;
@@ -30,7 +30,8 @@ public class WordSelectionManager : MonoBehaviour
 
     private List<GridText> m_selectedCells = new List<GridText>();
 
-    private GridText m_lastCell;
+    private GridText m_previousCell;
+    private GridText m_currentCell;
 
     public List<WordEntry> GetWords() { return m_words; }
     public List<WordEntry> GetDebugWords() { return m_debugWords; }
@@ -105,15 +106,46 @@ public class WordSelectionManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Select the current cell and unhighlight if we go backwards.
+    /// </summary>
     void TryAddCellUnderPointer()
     {
         GridText cell = GetCellUnderPointer();
+        if (cell == null)
+            return;
 
-        if (cell != null && cell != m_lastCell)
+        int count = m_selectedCells.Count;
+
+        if (count > 0)
         {
-            AddCell(cell);
-            m_lastCell = cell;
+            GridText last = m_selectedCells[count - 1];
+
+            if (cell == last)
+            {
+                // Still on the same cell, do nothing
+                return;
+            }
+
+            // Backtracking
+            if (count > 1 && cell == m_selectedCells[count - 2])
+            {
+                // Unhighlight the last cell
+                if (last.GetHighlighted())
+                {
+                    last.HighlightGreen();
+                }
+                else
+                {
+                    last.Unhighlight();
+                }
+                m_selectedCells.RemoveAt(count - 1);
+                return;
+            }
         }
+
+        // New forward cell
+        AddCell(cell);
     }
 
     private readonly List<RaycastResult> _raycastResults = new List<RaycastResult>();
@@ -157,7 +189,7 @@ public class WordSelectionManager : MonoBehaviour
 
     void EndSelection()
     {
-        m_lastCell = null;
+        m_currentCell = null;
 
         var word = "";
         foreach (var c in m_selectedCells)
