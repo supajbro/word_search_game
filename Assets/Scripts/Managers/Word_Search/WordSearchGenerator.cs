@@ -142,22 +142,8 @@ public class WordSearchGenerator : MonoBehaviour
         }
     }
 
-    bool IsPartOfPlacedWord(int row, int col)
-    {
-        foreach (var word in m_placedWordPositions)
-        {
-            foreach (var pos in word)
-            {
-                if (pos.x == row && pos.y == col)
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
     /// <summary>
-    /// Tries to place the word in the grid
+    /// Tries to place the word in the grid.
     /// </summary>
     bool PlaceWord(string word)
     {
@@ -308,6 +294,56 @@ public class WordSearchGenerator : MonoBehaviour
         return true;
     }
 
+    void PrintGrid()
+    {
+        for (int r = 0; r < WordSelectionManager.Instance.m_rows; r++)
+        {
+            string line = "";
+
+            for (int c = 0; c < WordSelectionManager.Instance.m_cols; c++)
+            {
+                line += m_grid[r, c] + " ";
+                m_totalLetters++;
+            }
+
+            Debug.Log(line);
+        }
+    }
+
+    #region - HELPERS -
+    /// <summary>
+    /// We can tell if this letter is part of a word or a random letter.
+    /// </summary>
+    bool IsPartOfPlacedWord(int row, int col)
+    {
+        foreach (var word in m_placedWordPositions)
+        {
+            foreach (var pos in word)
+            {
+                if (pos.x == row && pos.y == col)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Decides what the additional letters to fill the grid will be.
+    /// </summary>
+    char GetRandomAdditionalLetter()
+    {
+        // If this word search has additional letters, make sure the empty grid letters are these letters...
+        if (m_selectedWordEntry.m_additionalLetters.Count > 0)
+        {
+            int index = Random.Range(0, m_selectedWordEntry.m_additionalLetters.Count);
+            return (char)m_selectedWordEntry.m_additionalLetters[index];
+        }
+
+        // Give the dawgs random letters yeah
+        return (char)('A' + Random.Range(0, 26));
+    }
+
     List<char> GetLetterPool()
     {
         List<char> pool = new List<char>();
@@ -325,35 +361,6 @@ public class WordSearchGenerator : MonoBehaviour
 
         return pool;
     }
-
-    /// <summary>
-    /// Decides what the additional letters to fill the grid will be.
-    /// </summary>
-    char GetRandomAdditionalLetter()
-    {
-        if (m_selectedWordEntry.m_additionalLetters.Count > 0)
-        {
-            int index = Random.Range(0, m_selectedWordEntry.m_additionalLetters.Count);
-            return (char)m_selectedWordEntry.m_additionalLetters[index];
-        }
-
-        return (char)('A' + Random.Range(0, 26));
-    }
-
-    void PrintGrid()
-    {
-        for (int r = 0; r < WordSelectionManager.Instance.m_rows; r++)
-        {
-            string line = "";
-
-            for (int c = 0; c < WordSelectionManager.Instance.m_cols; c++)
-            {
-                line += m_grid[r, c] + " ";
-                m_totalLetters++;
-            }
-
-            Debug.Log(line);
-        }
-    }
+    #endregion
 
 }

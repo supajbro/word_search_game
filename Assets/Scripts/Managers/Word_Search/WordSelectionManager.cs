@@ -43,6 +43,7 @@ public class WordSelectionManager : MonoBehaviour
     [SerializeField] private TestGameStart m_testState;
     #endregion
 
+    #region - INIT WORD SEARCH -
     void Awake()
     {
         Instance = this;
@@ -86,15 +87,11 @@ public class WordSelectionManager : MonoBehaviour
         m_debugWords.AddRange(debugLoaded);
         Debug.Log("Loaded debug words: " + m_debugWords.Count);
     }
+    #endregion
 
+    #region - INPUT -
     void Update()
     {
-        // Finger / mouse down
-        if (Input.GetMouseButtonDown(0))
-        {
-            TryStartSelection();
-        }
-
         // Finger held
         if (Input.GetMouseButton(0))
         {
@@ -105,15 +102,6 @@ public class WordSelectionManager : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             EndSelection();
-        }
-    }
-
-    void TryStartSelection()
-    {
-        GridText cell = GetCellUnderPointer();
-        if (cell != null)
-        {
-            StartSelection(cell);
         }
     }
 
@@ -161,12 +149,6 @@ public class WordSelectionManager : MonoBehaviour
         return null;
     }
 
-    public void StartSelection(GridText cell)
-    {
-/*        m_lastCell = cell;
-        AddCell(cell);*/
-    }
-
     public void AddCell(GridText cell)
     {
         m_selectedCells.Add(cell);
@@ -184,14 +166,7 @@ public class WordSelectionManager : MonoBehaviour
 
         foreach (var cell in m_selectedCells)
         {
-            if (bValidWordFound)
-            {
-                cell.HighlightGreen();
-            }
-
-            // Make sure if we try and re-highlight an already correctly highlighted text
-            // to make it the correct highlighted again.
-            if (cell.GetHighlighted())
+            if (bValidWordFound || cell.GetHighlighted())
             {
                 cell.HighlightGreen();
                 continue;
@@ -205,5 +180,5 @@ public class WordSelectionManager : MonoBehaviour
     {
         m_selectedCells.Clear();
     }
-
+    #endregion
 }

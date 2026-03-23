@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class GridText : MonoBehaviour, IPointerDownHandler
+public class GridText : MonoBehaviour
 {
     private Button m_button;                            // <- Button user can interact with.
     [SerializeField] private TextMeshProUGUI m_text;    // <- Text that is visible to the player.
@@ -55,11 +55,6 @@ public class GridText : MonoBehaviour, IPointerDownHandler
     public bool GetHighlighted()
     {
         return m_highlighted;
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        WordSelectionManager.Instance.StartSelection(this);
     }
 
     public void HighlightGreen()
