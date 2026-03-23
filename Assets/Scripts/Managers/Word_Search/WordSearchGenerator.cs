@@ -28,7 +28,7 @@ public class WordSearchGenerator : MonoBehaviour
 
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
-    [SerializeField] private bool bAlwaysPickTrex = false;
+    [SerializeField] private bool bPickDebugEnties = false;
     #endregion
 
     public WordEntry GetWordSearch() { return m_selectedWordEntry; }
@@ -45,7 +45,7 @@ public class WordSearchGenerator : MonoBehaviour
 
     private void SelectWordEntry()
     {
-        var words = WordSelectionManager.Instance.GetWords();
+        var words = bPickDebugEnties ? WordSelectionManager.Instance.GetDebugWords() : WordSelectionManager.Instance.GetWords();
 
         if(words.Count == 0)
         {
@@ -54,8 +54,9 @@ public class WordSearchGenerator : MonoBehaviour
         }
 
         // Randomly pick the word search for this round.
-        int index = (bAlwaysPickTrex) ? 0 : UnityEngine.Random.Range(0, words.Count);
-        m_selectedWordEntry = words[index];
+        int index = UnityEngine.Random.Range(0, words.Count);
+        var word = words[index];
+        m_selectedWordEntry = word;
 
         WordSelectionManager.Instance.m_rows = m_selectedWordEntry.m_rows;
         WordSelectionManager.Instance.m_cols = m_selectedWordEntry.m_cols;

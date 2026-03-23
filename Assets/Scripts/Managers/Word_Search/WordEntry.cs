@@ -10,6 +10,7 @@ public class WordEntry : ScriptableObject
         public string m_word;           // <- Word that will appear
         public int count;               // <- Amount of times that word will appear
     }
+    public string m_name;
     public List<Entry> m_words; // <- All the words for this word search.
     public int m_rows;
     public int m_cols;

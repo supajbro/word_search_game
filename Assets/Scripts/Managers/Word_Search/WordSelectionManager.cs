@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class WordSelectionManager : MonoBehaviour
 {
-    [SerializeField] private List<WordEntry> m_words = new List<WordEntry>();   // <- All the words that will be generated (includes amount of times it will be generated).
+    [SerializeField] private List<WordEntry> m_words = new List<WordEntry>();           // <- All the words that will be generated (includes amount of times it will be generated).
+    [SerializeField] private List<WordEntry> m_debugWords = new List<WordEntry>();      // <- All the debug words that will be generated (includes amount of times it will be generated).
 
     public int m_rows = -1;                                                     // <- Amount of rows text will be on.
     public int m_cols = -1;                                                     // <- Amount of columns text will be on.
@@ -30,6 +31,7 @@ public class WordSelectionManager : MonoBehaviour
     public bool IsSelecting { get; private set; }
 
     public List<WordEntry> GetWords() { return m_words; }
+    public List<WordEntry> GetDebugWords() { return m_debugWords; }
     public int GetMinRows() { return m_minRows; }
     public int GetMinColumns() { return m_minCols; }
 
@@ -62,12 +64,17 @@ public class WordSelectionManager : MonoBehaviour
     private void LoadAllWords()
     {
         m_words.Clear();
+        m_debugWords.Clear();
 
         WordEntry[] loaded = Resources.LoadAll<WordEntry>("Word_Entries");
 
         m_words.AddRange(loaded);
 
         Debug.Log("Loaded words: " + m_words.Count);
+
+        WordEntry[] debugLoaded = Resources.LoadAll<WordEntry>("Debug_Word_Entries");
+        m_debugWords.AddRange(debugLoaded);
+        Debug.Log("Loaded debug words: " + m_debugWords.Count);
     }
 
     void Update()

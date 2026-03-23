@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46c273e73db2d72498031acce1c51cc4, type: 3}
-  m_Name: TREX
+  m_Name: DEBUG_TREX
   m_EditorClassIdentifier: Assembly-CSharp::WordEntry
   m_name: EASY_TREX
   m_words:

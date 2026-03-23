@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c273e73db2d72498031acce1c51cc4, type: 3}
   m_Name: STEGOSAURUS
   m_EditorClassIdentifier: Assembly-CSharp::WordEntry
+  m_name: EASY_STEGOSAURUS
   m_words:
   - m_word: STEGOSAURUS
     count: 4
