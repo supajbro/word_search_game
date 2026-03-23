@@ -10,6 +10,7 @@ public class WordSearchGenerator : MonoBehaviour
     private int m_totalLetters = -1;
 
     private char[,] m_grid;
+    private List<List<Vector2Int>> m_placedWordPositions = new List<List<Vector2Int>>();
 
     private Vector2Int[] m_directions =                                         // <- Directions words can appear on.
     {
@@ -28,7 +29,8 @@ public class WordSearchGenerator : MonoBehaviour
 
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
-    [SerializeField] private bool bPickDebugEnties = false;
+    [SerializeField] private bool m_bPickDebugEnties        = false;
+    [SerializeField] private bool m_bHighlightPlacedWords   = false;
     #endregion
 
     public WordEntry GetWordSearch() { return m_selectedWordEntry; }
@@ -43,9 +45,12 @@ public class WordSearchGenerator : MonoBehaviour
         SpawnLetters(gridParent);
     }
 
+    /// <summary>
+    /// Choose the selected word entry.
+    /// </summary>
     private void SelectWordEntry()
     {
-        var words = bPickDebugEnties ? WordSelectionManager.Instance.GetDebugWords() : WordSelectionManager.Instance.GetWords();
+        var words = m_bPickDebugEnties ? WordSelectionManager.Instance.GetDebugWords() : WordSelectionManager.Instance.GetWords();
 
         if(words.Count == 0)
         {
@@ -62,16 +67,47 @@ public class WordSearchGenerator : MonoBehaviour
         WordSelectionManager.Instance.m_cols = m_selectedWordEntry.m_cols;
     }
 
+    /// <summary>
+    /// Place all items (words and letters) on the grid.
+    /// </summary>
     private void GenerateGrid()
     {
-        m_grid = new char[WordSelectionManager.Instance.m_rows, WordSelectionManager.Instance.m_cols];
+        m_placedWordPositions.Clear();
 
-        foreach (var entry in m_selectedWordEntry.m_words)
+        bool success = true;
+        bool started = false;
+        int attempts = 0;
+        const int MAX_ATTEMPTS = 100;
+
+        while ((!success || !started) && attempts < MAX_ATTEMPTS)
         {
-            for (int i = 0; i < entry.count; i++)
+            m_grid = new char[WordSelectionManager.Instance.m_rows, WordSelectionManager.Instance.m_cols];
+
+            //success = true;
+            started = true;
+
+            foreach (var entry in m_selectedWordEntry.m_words)
             {
-                PlaceWord(entry.m_word.ToUpper());
+                for (int i = 0; i < entry.count; i++)
+                {
+                    if (!PlaceWord(entry.m_word.ToUpper()))
+                    {
+                        success = false;
+                        break;
+                    }
+                }
+
+                if (!success)
+                    break;
             }
+
+            attempts++;
+        }
+
+        if(!success)
+        {
+            Debug.LogError("Unable to generate all words for the word search. Game will break now.");
+            return;
         }
 
         FillEmptySpaces();
@@ -96,12 +132,34 @@ public class WordSearchGenerator : MonoBehaviour
                 {
                     letter.SetLetter(m_grid[r, c].ToString());
                     letter.SetRowAndColumn(r, c);
+
+                    if (m_bHighlightPlacedWords && IsPartOfPlacedWord(r, c))
+                    {
+                        letter.GetText().color = Color.red;
+                    }
                 }
             }
         }
     }
 
-    void PlaceWord(string word)
+    bool IsPartOfPlacedWord(int row, int col)
+    {
+        foreach (var word in m_placedWordPositions)
+        {
+            foreach (var pos in word)
+            {
+                if (pos.x == row && pos.y == col)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to place the word in the grid
+    /// </summary>
+    bool PlaceWord(string word)
     {
         int attempts = 100;
 
@@ -113,20 +171,27 @@ public class WordSearchGenerator : MonoBehaviour
 
             if (CanPlaceWord(word, startRow, startCol, dir))
             {
+                List<Vector2Int> positions = new List<Vector2Int>();
+
                 for (int i = 0; i < word.Length; i++)
                 {
                     int r = startRow + dir.y * i;
                     int c = startCol + dir.x * i;
                     m_grid[r, c] = word[i];
-                }
 
-                return;
+                    positions.Add(new Vector2Int(r, c));
+                }
+                m_placedWordPositions.Add(positions);
+                return true;
             }
         }
 
-        Debug.LogWarning("Failed to place word: " + word);
+        return false;
     }
 
+    /// <summary>
+    /// Determines if the game can place the word in the entry
+    /// </summary>
     bool CanPlaceWord(string word, int row, int col, Vector2Int dir)
     {
         for (int i = 0; i < word.Length; i++)
@@ -135,25 +200,141 @@ public class WordSearchGenerator : MonoBehaviour
             int c = col + dir.x * i;
 
             if (r < 0 || r >= WordSelectionManager.Instance.m_rows || c < 0 || c >= WordSelectionManager.Instance.m_cols)
+            {
                 return false;
+            }
 
             if (m_grid[r, c] != '\0' && m_grid[r, c] != word[i])
+            {
                 return false;
+            }
         }
 
         return true;
     }
 
+    /// <summary>
+    /// Generates all of the letters that won't be words.
+    /// </summary>
     void FillEmptySpaces()
     {
         for (int r = 0; r < WordSelectionManager.Instance.m_rows; r++)
         {
             for (int c = 0; c < WordSelectionManager.Instance.m_cols; c++)
             {
-                if (m_grid[r, c] == '\0')
-                    m_grid[r, c] = (char)('A' + Random.Range(0, 26));
+                if (m_grid[r, c] != '\0')
+                    continue;
+
+                List<char> validLetters = GetValidLettersForCell(r, c);
+
+                if (validLetters.Count == 0)
+                {
+                    // fallback (very rare)
+                    m_grid[r, c] = GetRandomAdditionalLetter();
+                }
+                else
+                {
+                    m_grid[r, c] = validLetters[Random.Range(0, validLetters.Count)];
+                }
             }
         }
+    }
+
+    List<char> GetValidLettersForCell(int row, int col)
+    {
+        List<char> valid = new List<char>();
+
+        List<char> pool = GetLetterPool();
+
+        foreach (char letter in pool)
+        {
+            m_grid[row, col] = letter;
+
+            bool createsWord = false;
+
+            foreach (var entry in m_selectedWordEntry.m_words)
+            {
+                if (CreatesWord(entry.m_word.ToUpper(), row, col))
+                {
+                    createsWord = true;
+                    break;
+                }
+            }
+
+            if (!createsWord)
+            {
+                valid.Add(letter);
+            }
+
+            m_grid[row, col] = '\0'; // reset
+        }
+
+        return valid;
+    }
+
+    bool CreatesWord(string word, int row, int col)
+    {
+        foreach (var dir in m_directions)
+        {
+            // Try all offsets so the word could pass through this cell
+            for (int offset = 0; offset < word.Length; offset++)
+            {
+                int startRow = row - dir.y * offset;
+                int startCol = col - dir.x * offset;
+
+                if (MatchesWordAt(word, startRow, startCol, dir))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool MatchesWordAt(string word, int row, int col, Vector2Int dir)
+    {
+        for (int i = 0; i < word.Length; i++)
+        {
+            int r = row + dir.y * i;
+            int c = col + dir.x * i;
+
+            if (r < 0 || r >= WordSelectionManager.Instance.m_rows ||
+                c < 0 || c >= WordSelectionManager.Instance.m_cols)
+                return false;
+
+            if (m_grid[r, c] != word[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    List<char> GetLetterPool()
+    {
+        List<char> pool = new List<char>();
+
+        if (m_selectedWordEntry.m_additionalLetters.Count > 0)
+        {
+            foreach (var l in m_selectedWordEntry.m_additionalLetters)
+                pool.Add((char)l);
+        }
+        else
+        {
+            for (int i = 0; i < 26; i++)
+                pool.Add((char)('A' + i));
+        }
+
+        return pool;
+    }
+
+    char GetRandomAdditionalLetter()
+    {
+        if (m_selectedWordEntry.m_additionalLetters.Count > 0)
+        {
+            int index = Random.Range(0, m_selectedWordEntry.m_additionalLetters.Count);
+            return (char)m_selectedWordEntry.m_additionalLetters[index];
+        }
+
+        return (char)('A' + Random.Range(0, 26));
     }
 
     void PrintGrid()

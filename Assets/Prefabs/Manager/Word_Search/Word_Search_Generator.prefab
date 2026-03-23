@@ -45,4 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WordSearchGenerator
   m_gridTextPrefab: {fileID: 1147220817092624011, guid: c37d44b5b0fa8a146bb309b012dc03f0, type: 3}
-  bPickDebugEnties: 1
+  m_bPickDebugEnties: 1
+  m_bHighlightPlacedWords: 1

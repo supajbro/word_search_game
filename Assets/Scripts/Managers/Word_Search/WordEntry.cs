@@ -11,7 +11,8 @@ public class WordEntry : ScriptableObject
         public int count;               // <- Amount of times that word will appear
     }
     public string m_name;
-    public List<Entry> m_words; // <- All the words for this word search.
+    public List<Entry> m_words;                 // <- All the words for this word search.
+    public List<char> m_additionalLetters;      // <- All of the extra letters that can appear (if blank then random).
     public int m_rows;
     public int m_cols;
 }
