@@ -15,6 +15,13 @@ public class GridText : MonoBehaviour
     private int m_row;
     private int m_col;
 
+    [Header("Animations")]
+    [SerializeField] private Vector2 m_scaleUpValue     = new Vector2(1.5f, 1.5f);
+    [SerializeField] private Vector2 m_scaleDownValue   = new Vector2(1f, 1f);
+    [SerializeField] private LeanTweenType m_easeUp     = LeanTweenType.easeOutBack;
+    [SerializeField] private LeanTweenType m_easeDown   = LeanTweenType.easeOutBack;
+    [SerializeField] private float m_duration           = 1.0f;
+
     public void SetLetter(string l)
     {
         m_letter = l;
@@ -37,6 +44,12 @@ public class GridText : MonoBehaviour
         return m_button;
     }
 
+    public string GetLetter()
+    {
+        return m_letter;
+    }
+
+    #region - TEXT MESH -
     public TextMeshProUGUI GetText()
     {
         if (m_text == null)
@@ -47,11 +60,28 @@ public class GridText : MonoBehaviour
         return m_text;
     }
 
-    public string GetLetter()
+    public void ScaleTextMeshUp()
     {
-        return m_letter;
+        if (m_text == null)
+        {
+            Debug.LogError("Missing grid text.");
+            return;
+        }
+        LeanTween.scale(m_text.gameObject, m_scaleUpValue, m_duration).setEase(m_easeUp);
     }
 
+    public void ScaleTextMeshDown()
+    {
+        if (m_text == null)
+        {
+            Debug.LogError("Missing grid text.");
+            return;
+        }
+        LeanTween.scale(m_text.gameObject, m_scaleDownValue, m_duration).setEase(m_easeDown);
+    }
+    #endregion
+
+    #region - HIGHLIGHTING -
     public bool GetHighlighted()
     {
         return m_highlighted;
@@ -66,10 +96,13 @@ public class GridText : MonoBehaviour
     public void HighlightSelected()
     {
         m_text.color = Color.yellow;
+        ScaleTextMeshUp();
     }
 
     public void Unhighlight()
     {
         m_text.color = m_initialColor;
+        ScaleTextMeshDown();
     }
+    #endregion
 }

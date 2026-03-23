@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class WordSearchGenerator : MonoBehaviour
 {
-    private WordEntry m_selectedWordEntry;                                           // <- The selected word search for this round.
+    private WordEntry m_selectedWordEntry;                          // <- The selected word search for this round.
 
-    [SerializeField] private GridText m_gridTextPrefab;                         // <- Prefab containing the letter.
+    [SerializeField] private GridText m_gridTextPrefab;             // <- Prefab containing the letter.
     private int m_totalLetters = -1;
 
     private char[,] m_grid;
     private List<List<Vector2Int>> m_placedWordPositions = new List<List<Vector2Int>>();
 
-    private Vector2Int[] m_directions =                                         // <- Directions words can appear on.
+    private Vector2Int[] m_directions =                             // <- Directions words can appear on.
     {
         // Straight lines
         Vector2Int.right,
@@ -29,8 +29,8 @@ public class WordSearchGenerator : MonoBehaviour
 
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
-    [SerializeField] private bool m_bPickDebugEnties        = false;
-    [SerializeField] private bool m_bHighlightPlacedWords   = false;
+    [SerializeField] private bool m_bPickDebugEntries        = false;
+    [SerializeField] private bool m_bHighlightPlacedWords    = false;
     #endregion
 
     public WordEntry GetWordSearch() { return m_selectedWordEntry; }
@@ -50,7 +50,7 @@ public class WordSearchGenerator : MonoBehaviour
     /// </summary>
     private void SelectWordEntry()
     {
-        var words = m_bPickDebugEnties ? WordSelectionManager.Instance.GetDebugWords() : WordSelectionManager.Instance.GetWords();
+        var words = m_bPickDebugEntries ? WordSelectionManager.Instance.GetDebugWords() : WordSelectionManager.Instance.GetWords();
 
         if(words.Count == 0)
         {

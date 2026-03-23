@@ -30,9 +30,6 @@ public class WordSelectionManager : MonoBehaviour
 
     private List<GridText> m_selectedCells = new List<GridText>();
 
-    private GridText m_previousCell;
-    private GridText m_currentCell;
-
     public List<WordEntry> GetWords() { return m_words; }
     public List<WordEntry> GetDebugWords() { return m_debugWords; }
     public int GetMinRows() { return m_minRows; }
@@ -187,10 +184,11 @@ public class WordSelectionManager : MonoBehaviour
         cell.HighlightSelected();
     }
 
+    /// <summary>
+    /// Let go of input and clearing what needs to be cleared.
+    /// </summary>
     void EndSelection()
     {
-        m_currentCell = null;
-
         var word = "";
         foreach (var c in m_selectedCells)
             word += c.GetLetter();
