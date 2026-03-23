@@ -326,6 +326,9 @@ public class WordSearchGenerator : MonoBehaviour
         return pool;
     }
 
+    /// <summary>
+    /// Decides what the additional letters to fill the grid will be.
+    /// </summary>
     char GetRandomAdditionalLetter()
     {
         if (m_selectedWordEntry.m_additionalLetters.Count > 0)

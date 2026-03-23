@@ -35,14 +35,17 @@ public class WordSelectionManager : MonoBehaviour
     public int GetMinRows() { return m_minRows; }
     public int GetMinColumns() { return m_minCols; }
 
+    #region - DEBUG VARIABLES -
+    [Header("DEBUG")]
+    [SerializeField] private bool m_bSpawnTestState = false;
+    [SerializeField] private TestGameStart m_testState;
+    #endregion
+
     void Awake()
     {
         Instance = this;
 
         LoadAllWords();
-
-        //m_rows = ValidateRows();
-        //m_cols = CalculateColumns();
 
         m_cam = Instantiate(m_camPrefab);
         m_gridCanvas = Instantiate(m_gridCanvasPrefab);
@@ -58,6 +61,11 @@ public class WordSelectionManager : MonoBehaviour
         foreach (var entry in m_generator.GetWordSearch().m_words)
         {
             validWords.Add(entry.m_word);
+        }
+
+        if(m_bSpawnTestState && m_testState)
+        {
+            Instantiate(m_testState.gameObject);
         }
     }
 
