@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class WordSelectionManager : MonoBehaviour
 {
@@ -26,9 +28,9 @@ public class WordSelectionManager : MonoBehaviour
 
     public List<string> validWords = new List<string>();
 
-    private List<GridText> selectedCells = new List<GridText>();
+    private List<GridText> m_selectedCells = new List<GridText>();
 
-    public bool IsSelecting { get; private set; }
+    private GridText m_lastCell;
 
     public List<WordEntry> GetWords() { return m_words; }
     public List<WordEntry> GetDebugWords() { return m_debugWords; }
@@ -87,65 +89,121 @@ public class WordSelectionManager : MonoBehaviour
 
     void Update()
     {
-        if (IsSelecting && Input.GetMouseButtonUp(0))
+        // Finger / mouse down
+        if (Input.GetMouseButtonDown(0))
+        {
+            TryStartSelection();
+        }
+
+        // Finger held
+        if (Input.GetMouseButton(0))
+        {
+            TryAddCellUnderPointer();
+        }
+
+        // Finger up
+        if (Input.GetMouseButtonUp(0))
         {
             EndSelection();
         }
     }
 
+    void TryStartSelection()
+    {
+        GridText cell = GetCellUnderPointer();
+        if (cell != null)
+        {
+            StartSelection(cell);
+        }
+    }
+
+    void TryAddCellUnderPointer()
+    {
+        GridText cell = GetCellUnderPointer();
+
+        if (cell != null && cell != m_lastCell)
+        {
+            AddCell(cell);
+            m_lastCell = cell;
+        }
+    }
+
+    private readonly List<RaycastResult> _raycastResults = new List<RaycastResult>();
+    GridText GetCellUnderPointer()
+    {
+        if (EventSystem.current == null)
+            return null;
+
+        PointerEventData data = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        _raycastResults.Clear();
+        EventSystem.current.RaycastAll(data, _raycastResults);
+
+        for (int i = 0; i < _raycastResults.Count; i++)
+        {
+            var hit = _raycastResults[i];
+
+            if (hit.gameObject == null)
+                continue;
+
+            // Safely try to get GridText directly or from parent
+            if (hit.gameObject.TryGetComponent<GridText>(out var cell))
+                return cell;
+
+            cell = hit.gameObject.GetComponentInParent<GridText>();
+            if (cell != null)
+                return cell;
+        }
+
+        return null;
+    }
+
     public void StartSelection(GridText cell)
     {
-        ClearSelection();
-
-        IsSelecting = true;
-        AddCell(cell);
+/*        m_lastCell = cell;
+        AddCell(cell);*/
     }
 
     public void AddCell(GridText cell)
     {
-        if (selectedCells.Contains(cell))
-            return;
-
-        selectedCells.Add(cell);
+        m_selectedCells.Add(cell);
         cell.HighlightSelected();
     }
 
     void EndSelection()
     {
-        IsSelecting = false;
+        m_lastCell = null;
 
-        string word = "";
-
-        foreach (var c in selectedCells)
+        var word = "";
+        foreach (var c in m_selectedCells)
             word += c.GetLetter();
+        bool bValidWordFound = validWords.Contains(word);
 
-        if (validWords.Contains(word))
+        foreach (var cell in m_selectedCells)
         {
-            foreach (var c in selectedCells)
+            if (bValidWordFound)
             {
-                c.HighlightGreen();
+                cell.HighlightGreen();
             }
-        }
-        else
-        {
-            foreach (var c in selectedCells)
+
+            // Make sure if we try and re-highlight an already correctly highlighted text
+            // to make it the correct highlighted again.
+            if (cell.GetHighlighted())
             {
-                // Make sure if we try and re-highlight an already correctly highlighted text
-                // to make it the correct highlighted again.
-                if(c.GetHighlighted())
-                {
-                    c.HighlightGreen();
-                    continue;
-                }
-                c.Unhighlight();
+                cell.HighlightGreen();
+                continue;
             }
-            ClearSelection();
+            cell.Unhighlight();
         }
+        ClearSelection();
     }
 
     void ClearSelection()
     {
-        selectedCells.Clear();
+        m_selectedCells.Clear();
     }
 
 }

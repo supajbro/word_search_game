@@ -15,7 +15,7 @@ MonoBehaviour:
   m_name: EASY_TREX
   m_words:
   - m_word: TREX
-    count: 1
+    count: 4
   m_additionalLetters: 5400520045005800
   m_rows: 10
   m_cols: 10
