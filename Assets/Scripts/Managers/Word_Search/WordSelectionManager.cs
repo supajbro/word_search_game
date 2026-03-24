@@ -64,6 +64,8 @@ public class WordSelectionManager : MonoBehaviour
             validWords.Add(entry.m_word);
         }
 
+        LeanTween.reset();
+
         if(m_bSpawnTestState && m_testState)
         {
             Instantiate(m_testState.gameObject);

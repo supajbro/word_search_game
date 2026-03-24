@@ -242,8 +242,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GridText
   m_text: {fileID: 1883397039017604930}
   m_initialColor: {r: 0.3019608, g: 0.3019608, b: 0.3019608, a: 1}
+  m_maxValue: {x: 1.6, y: 1.6}
   m_scaleUpValue: {x: 1.5, y: 1.5}
   m_scaleDownValue: {x: 1, y: 1}
   m_easeUp: 1
-  m_easeDown: 27
-  m_duration: 0.5
+  m_easeDown: 24
+  m_scaleUpDuration: 0.1
+  m_scaleDownDuration: 0.5
+  m_pingPongDuration: 0.2
