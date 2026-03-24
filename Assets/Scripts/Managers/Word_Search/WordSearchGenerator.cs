@@ -12,21 +12,6 @@ public class WordSearchGenerator : MonoBehaviour
     private char[,] m_grid;
     private List<List<Vector2Int>> m_placedWordPositions = new List<List<Vector2Int>>();
 
-    private Vector2Int[] m_directions =                             // <- Directions words can appear on.
-    {
-        // Straight lines
-        Vector2Int.right,
-        Vector2Int.down,
-        Vector2Int.left,
-        Vector2Int.up,
-
-        // Diagonal lines
-        new Vector2Int(1, 1),
-        new Vector2Int(-1, 1),
-        new Vector2Int(1, -1),
-        new Vector2Int(-1, -1)
-    };
-
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
     [SerializeField] private bool m_bPickDebugEntries        = false;
@@ -151,7 +136,7 @@ public class WordSearchGenerator : MonoBehaviour
 
         while (attempts-- > 0)
         {
-            Vector2Int dir = m_directions[Random.Range(0, m_directions.Length)];
+            Vector2Int dir = WordSelectionManager.Instance.GetDirections()[Random.Range(0, WordSelectionManager.Instance.GetDirections().Length)];
             int startRow = Random.Range(0, WordSelectionManager.Instance.m_rows);
             int startCol = Random.Range(0, WordSelectionManager.Instance.m_cols);
 
@@ -260,7 +245,7 @@ public class WordSearchGenerator : MonoBehaviour
 
     bool CreatesWord(string word, int row, int col)
     {
-        foreach (var dir in m_directions)
+        foreach (var dir in WordSelectionManager.Instance.GetDirections())
         {
             // Try all offsets so the word could pass through this cell
             for (int offset = 0; offset < word.Length; offset++)

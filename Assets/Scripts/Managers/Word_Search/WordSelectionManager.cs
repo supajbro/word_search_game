@@ -5,35 +5,50 @@ using UnityEngine.EventSystems;
 
 public class WordSelectionManager : MonoBehaviour
 {
+    public static WordSelectionManager Instance;
+
     [SerializeField] private List<WordEntry> m_words = new List<WordEntry>();           // <- All the words that will be generated (includes amount of times it will be generated).
     [SerializeField] private List<WordEntry> m_debugWords = new List<WordEntry>();      // <- All the debug words that will be generated (includes amount of times it will be generated).
 
     public int m_rows = -1;                                                             // <- Amount of rows text will be on.
     public int m_cols = -1;                                                             // <- Amount of columns text will be on.
 
-    [SerializeField] private int m_minRows = 10;                                        // <- Min amount of rows the game can be.
-    [SerializeField] private int m_minCols = 10;                                        // <- Min amount of columns the game can be.
+    public List<string> validWords = new List<string>();                                // <- All valid words in this word search.
 
+    private List<GridText> m_selectedCells = new List<GridText>();                      // <- All the selected cells in runtime.
+    private GridText m_currentCell;                                                     // <- Current cell we are on.
+
+    private Vector2Int[] m_directions =                                                 // <- Directions words can appear on.
+{
+        // Straight lines
+        Vector2Int.right,
+        Vector2Int.down,
+        Vector2Int.left,
+        Vector2Int.up,
+
+        // Diagonal lines
+        new Vector2Int(1, 1),
+        new Vector2Int(-1, 1),
+        new Vector2Int(1, -1),
+        new Vector2Int(-1, -1)
+    };
+
+    [Header("Prefabs")]
     [SerializeField] private WordSearchGenerator    m_generatorPrefab;
     [SerializeField] private WordSearchTitle        m_wordSearchTitlePrefab;
     [SerializeField] private GridCanvas             m_gridCanvasPrefab;
     [SerializeField] private Camera                 m_camPrefab;
 
+    [Header("Spawned objects")]
     private WordSearchGenerator m_generator;
     private WordSearchTitle     m_wordSearchTitle;
     private GridCanvas          m_gridCanvas;
     private Camera              m_cam;
 
-    public static WordSelectionManager Instance;
-
-    public List<string> validWords = new List<string>();
-
-    private List<GridText> m_selectedCells = new List<GridText>();
-
     public List<WordEntry> GetWords() { return m_words; }
     public List<WordEntry> GetDebugWords() { return m_debugWords; }
-    public int GetMinRows() { return m_minRows; }
-    public int GetMinColumns() { return m_minCols; }
+    public List<GridText> GetSelectedCells() { return m_selectedCells; }
+    public Vector2Int[] GetDirections() { return m_directions; }
 
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
@@ -111,39 +126,31 @@ public class WordSelectionManager : MonoBehaviour
     void TryAddCellUnderPointer()
     {
         GridText cell = GetCellUnderPointer();
+
         if (cell == null)
             return;
 
-        int count = m_selectedCells.Count;
-
-        if (count > 0)
+        // First cell, always allowed
+        if (m_selectedCells.Count == 0)
         {
-            GridText last = m_selectedCells[count - 1];
-
-            if (cell == last)
-            {
-                // Still on the same cell, do nothing
-                return;
-            }
-
-            // Backtracking
-            if (count > 1 && cell == m_selectedCells[count - 2])
-            {
-                // Unhighlight the last cell
-                if (last.GetHighlighted())
-                {
-                    last.HighlightGreen();
-                }
-                else
-                {
-                    last.Unhighlight();
-                }
-                m_selectedCells.RemoveAt(count - 1);
-                return;
-            }
+            AddCell(cell);
+            return;
         }
 
-        // New forward cell
+        GridText previousCell = m_selectedCells[m_selectedCells.Count - 1];
+
+        // Prevent re-adding same cell
+        if (cell == previousCell)
+            return;
+
+        Vector2Int prevPos = previousCell.GetGridPosition();
+        Vector2Int newPos = cell.GetGridPosition();
+
+        if (!IsValidStep(prevPos, newPos))
+            return;
+
+        Vector2Int dir = newPos - prevPos;
+
         AddCell(cell);
     }
 
@@ -182,6 +189,7 @@ public class WordSelectionManager : MonoBehaviour
 
     public void AddCell(GridText cell)
     {
+        m_currentCell = cell;
         m_selectedCells.Add(cell);
         cell.HighlightSelected();
     }
@@ -211,6 +219,26 @@ public class WordSelectionManager : MonoBehaviour
     void ClearSelection()
     {
         m_selectedCells.Clear();
+        m_currentCell = null;
+    }
+    #endregion
+
+    #region - HELPERS -
+    /// <summary>
+    /// A problem encountered is if you have "TRE" found and then there's an "X" far away, you can move
+    /// your finger off the grid and then select that "X" and the game will think its all good. this fixes that.
+    /// </summary>
+    bool IsValidStep(Vector2Int from, Vector2Int to)
+    {
+        Vector2Int delta = to - from;
+
+        foreach (var dir in m_directions)
+        {
+            if (delta == dir)
+                return true;
+        }
+
+        return false;
     }
     #endregion
 }

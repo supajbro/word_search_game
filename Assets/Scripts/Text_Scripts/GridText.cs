@@ -32,12 +32,6 @@ public class GridText : MonoBehaviour
         m_text.text = l;
     }
 
-    public void SetRowAndColumn(int row, int column)
-    {
-        m_row = row;
-        m_col = column;
-    }
-
     public Button GetButton()
     {
         if(m_button == null)
@@ -52,6 +46,19 @@ public class GridText : MonoBehaviour
     {
         return m_letter;
     }
+
+    #region - ROW AND COLUMN -
+    public void SetRowAndColumn(int row, int column)
+    {
+        m_row = row;
+        m_col = column;
+    }
+
+    public Vector2Int GetGridPosition()
+    {
+        return new Vector2Int(m_col, m_row);
+    }
+    #endregion
 
     #region - TEXT MESH -
     public TextMeshProUGUI GetText()
