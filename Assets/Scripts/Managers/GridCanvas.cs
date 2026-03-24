@@ -50,16 +50,20 @@ public class GridCanvas : MonoBehaviour
 
     public void ResizeGrid(int rows, int cols)
     {
-        float width = m_rect.rect.width;
-        float height = m_rect.rect.height;
+        RectTransform gridRect = m_grid.GetComponent<RectTransform>();
+        float width = gridRect.rect.width;
+        float height = gridRect.rect.height;
 
+        // total spacing between cells
         float totalSpacingX = m_grid.spacing.x * (cols - 1);
         float totalSpacingY = m_grid.spacing.y * (rows - 1);
 
+        // calculate cell size to fit inside the grid rect
         float cellWidth = (width - totalSpacingX) / cols;
         float cellHeight = (height - totalSpacingY) / rows;
 
-        float size = Mathf.Min(cellWidth, cellHeight);
+        // choose the smaller one to keep square cells
+        float size = Mathf.Max(0, Mathf.Min(cellWidth, cellHeight)); // avoid negative size
 
         m_grid.cellSize = new Vector2(size, size);
 
