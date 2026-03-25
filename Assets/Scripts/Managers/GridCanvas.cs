@@ -3,18 +3,33 @@ using UnityEngine.UI;
 
 public class GridCanvas : MonoBehaviour
 {
-    [SerializeField] private Canvas          m_canvas;
-    [SerializeField] private Transform       m_gridParent;
+    [Header("Grid Canvas")]
+    [SerializeField] private Canvas m_canvas;
 
+    [Header("Grid")]
+    [SerializeField] private GridLayoutGroup m_gridPrefab;
     private GridLayoutGroup m_grid;
+
+    [Header("Word Search Title Object")]
+    [SerializeField] private WordSearchTitle m_wordSearchTitlePrefab;
+    private WordSearchTitle m_wordSearchTitle;
+
+    private Transform       m_gridParent;
     private RectTransform   m_rect;
 
-    public void Init(int totalLetters)
+    public void Init()
     {
-        m_grid = GetComponentInChildren<GridLayoutGroup>();
-        m_rect = GetComponentInChildren<RectTransform>();
+        if (m_canvas == null || m_gridPrefab == null)
+        {
+            Debug.LogError("Missing essential components for the grid. Game will absolutely break.");
+            return;
+        }
 
-        if (m_grid == null || m_rect == null)
+        m_grid          = Instantiate(m_gridPrefab, m_canvas.transform);
+        m_gridParent    = m_grid.GetComponentInChildren<Transform>();
+        m_rect          = GetComponentInChildren<RectTransform>();
+
+        if (m_gridParent == null || m_rect == null)
         {
             Debug.LogError("Missing essential components for the grid. Resizing of grid skipped.");
             return;
@@ -24,6 +39,12 @@ public class GridCanvas : MonoBehaviour
         var cols = WordSelectionManager.Instance.m_cols;
 
         ResizeGrid(rows, cols);
+    }
+
+    public void InitWordSearchTitle()
+    {
+        m_wordSearchTitle = Instantiate(m_wordSearchTitlePrefab, m_canvas.transform);
+        m_wordSearchTitle.Init();
     }
 
     public Canvas GetCanvas()
@@ -44,6 +65,16 @@ public class GridCanvas : MonoBehaviour
             return null;
         }
         return m_gridParent;
+    }
+
+    public WordSearchTitle GetWordSearchTitle() 
+    {
+        if (m_wordSearchTitle == null)
+        {
+            Debug.LogError("Missing Word Search Title.");
+            return null;
+        }
+        return m_wordSearchTitle;
     }
 
     public void ResizeGrid(int rows, int cols)

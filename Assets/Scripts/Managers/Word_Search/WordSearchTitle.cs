@@ -9,12 +9,10 @@ public class WordSearchTitle : MonoBehaviour
     // The title of the word to find (i.e. "TREX").
     [SerializeField] private TextMeshProUGUI m_wordsToFindTitle;
 
-    private WordSearchGenerator m_generator;
     private WordSelectedBox m_wordSelectBox;
 
-    public void Init(WordSearchGenerator generator)
+    public void Init()
     {
-        m_generator = generator;
         SetWordSeachTitle();
 
         m_wordSelectBox = GetComponentInChildren<WordSelectedBox>();
@@ -30,12 +28,13 @@ public class WordSearchTitle : MonoBehaviour
 
     public void SetWordSeachTitle()
     {
-        if(m_generator == null)
+        var generator = WordSelectionManager.Instance.GetWordSearchGenerator();
+        if (generator == null)
         {
             Debug.LogError("Missing Word Search Generator reference.");
             return;
         }
-        var words = m_generator.GetWordSearch();
+        var words = generator.GetWordSearch();
         m_wordToFindText.text = (words.m_words.Count == 1) ? TextDB.Get("TXT_WORD_TO_FIND") : TextDB.Get("TXT_WORDS_TO_FIND");
 
         // Clear the words to find title text.

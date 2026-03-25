@@ -37,13 +37,11 @@ public class WordSelectionManager : MonoBehaviour
 
     [Header("Prefabs")]
     [SerializeField] private WordSearchGenerator    m_generatorPrefab;
-    [SerializeField] private WordSearchTitle        m_wordSearchTitlePrefab;
     [SerializeField] private GridCanvas             m_gridCanvasPrefab;
     [SerializeField] private Camera                 m_camPrefab;
 
     [Header("Spawned objects")]
     private WordSearchGenerator m_generator;
-    private WordSearchTitle     m_wordSearchTitle;
     private GridCanvas          m_gridCanvas;
     private Camera              m_cam;
 
@@ -52,7 +50,6 @@ public class WordSelectionManager : MonoBehaviour
     public List<GridText> GetSelectedCells() { return m_selectedCells; }
     public Vector2Int[] GetDirections() { return m_directions; }
     public WordSearchGenerator GetWordSearchGenerator() { return m_generator; }
-    public WordSearchTitle GetWordSearchTitle() { return m_wordSearchTitle; }
 
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
@@ -68,14 +65,12 @@ public class WordSelectionManager : MonoBehaviour
         LoadAllWords();
 
         m_cam = Instantiate(m_camPrefab);
-        m_gridCanvas = Instantiate(m_gridCanvasPrefab);
-        m_generator = Instantiate(m_generatorPrefab);
-        m_wordSearchTitle = Instantiate(m_wordSearchTitlePrefab, m_gridCanvas.GetCanvas().transform);
+        m_gridCanvas    = Instantiate(m_gridCanvasPrefab);
+        m_generator     = Instantiate(m_generatorPrefab);
 
+        m_gridCanvas.Init();
         m_generator.Init(m_gridCanvas.GetGridParent());
-        m_wordSearchTitle.Init(m_generator);
-
-        m_gridCanvas.Init(m_generator.GetTotalLetters());
+        m_gridCanvas.InitWordSearchTitle();
 
         // Add all the valid words for this word search.
         foreach (var entry in m_generator.GetWordSearch().m_words)
@@ -214,8 +209,8 @@ public class WordSelectionManager : MonoBehaviour
         m_selectedCells.Add(cell);
         cell.HighlightSelected();
 
-        m_wordSearchTitle.GetWordSelectBox().UpdateSelectedWord(cell.GetLetter());
-        m_wordSearchTitle.GetWordSelectBox().UpdatedLettersSelected();
+        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().UpdateSelectedWord(cell.GetLetter());
+        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().UpdatedLettersSelected();
     }
 
     /// <summary>
@@ -244,8 +239,8 @@ public class WordSelectionManager : MonoBehaviour
     {
         m_selectedCells.Clear();
         m_currentCell = null;
-        m_wordSearchTitle.GetWordSelectBox().ClearSelectedWord();
-        m_wordSearchTitle.GetWordSelectBox().ClearLettersSelected();
+        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().ClearSelectedWord();
+        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().ClearLettersSelected();
     }
     #endregion
 
