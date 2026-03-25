@@ -17,6 +17,8 @@ public class WordSelectionManager : MonoBehaviour
 
     private List<GridText> m_selectedCells = new List<GridText>();                      // <- All the selected cells in runtime.
     private GridText m_currentCell;                                                     // <- Current cell we are on.
+    private Vector2Int m_lockedDirection;
+    private bool m_hasLockedDirection = false;
 
     private Vector2Int[] m_directions =                                                 // <- Directions words can appear on.
 {
@@ -146,10 +148,27 @@ public class WordSelectionManager : MonoBehaviour
         Vector2Int prevPos = previousCell.GetGridPosition();
         Vector2Int newPos = cell.GetGridPosition();
 
-        if (!IsValidStep(prevPos, newPos))
+        // Enable this if you want to move to the next cell in any direction.
+        /*        if (!IsValidStep(prevPos, newPos))
+                    return;*/
+
+        // Enable this if you want to only move adjacent.
+        if (!IsAdjacent(prevPos, newPos))
             return;
 
         Vector2Int dir = newPos - prevPos;
+
+        // Lock direction after second cell
+        if (m_selectedCells.Count == 1)
+        {
+            m_lockedDirection = dir;
+            m_hasLockedDirection = true;
+        }
+        else
+        {
+            if (m_hasLockedDirection && dir != m_lockedDirection)
+                return;
+        }
 
         AddCell(cell);
     }
@@ -239,6 +258,14 @@ public class WordSelectionManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    bool IsAdjacent(Vector2Int a, Vector2Int b)
+    {
+        int dx = Mathf.Abs(a.x - b.x);
+        int dy = Mathf.Abs(a.y - b.y);
+
+        return dx <= 1 && dy <= 1 && (dx + dy > 0);
     }
     #endregion
 }
