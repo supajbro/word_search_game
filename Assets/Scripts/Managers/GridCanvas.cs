@@ -1,12 +1,10 @@
-using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GridCanvas : MonoBehaviour
 {
-    [SerializeField] private Canvas     m_canvas;
-    [SerializeField] private Transform  m_gridParent;
+    [SerializeField] private Canvas          m_canvas;
+    [SerializeField] private Transform       m_gridParent;
 
     private GridLayoutGroup m_grid;
     private RectTransform   m_rect;
@@ -16,7 +14,7 @@ public class GridCanvas : MonoBehaviour
         m_grid = GetComponentInChildren<GridLayoutGroup>();
         m_rect = GetComponentInChildren<RectTransform>();
 
-        if(m_grid == null || m_rect == null)
+        if (m_grid == null || m_rect == null)
         {
             Debug.LogError("Missing essential components for the grid. Resizing of grid skipped.");
             return;

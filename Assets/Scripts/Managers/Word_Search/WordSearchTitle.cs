@@ -10,11 +10,22 @@ public class WordSearchTitle : MonoBehaviour
     [SerializeField] private TextMeshProUGUI m_wordsToFindTitle;
 
     private WordSearchGenerator m_generator;
+    private WordSelectedBox m_wordSelectBox;
 
     public void Init(WordSearchGenerator generator)
     {
         m_generator = generator;
         SetWordSeachTitle();
+
+        m_wordSelectBox = GetComponentInChildren<WordSelectedBox>();
+        if(m_wordSelectBox != null)
+        {
+            m_wordSelectBox.Init();
+        }
+        else
+        {
+            Debug.LogError("Missing Word Select Box.");
+        }
     }
 
     public void SetWordSeachTitle()
@@ -35,5 +46,15 @@ public class WordSearchTitle : MonoBehaviour
         {
             m_wordsToFindTitle.text += entry.m_word.ToUpper() + "\n";
         }
+    }
+
+    public WordSelectedBox GetWordSelectBox()
+    {
+        if (m_wordSelectBox == null)
+        {
+            Debug.LogError("Missing Word Select Box.");
+            return null;
+        }
+        return m_wordSelectBox;
     }
 }

@@ -51,6 +51,8 @@ public class WordSelectionManager : MonoBehaviour
     public List<WordEntry> GetDebugWords() { return m_debugWords; }
     public List<GridText> GetSelectedCells() { return m_selectedCells; }
     public Vector2Int[] GetDirections() { return m_directions; }
+    public WordSearchGenerator GetWordSearchGenerator() { return m_generator; }
+    public WordSearchTitle GetWordSearchTitle() { return m_wordSearchTitle; }
 
     #region - DEBUG VARIABLES -
     [Header("DEBUG")]
@@ -211,6 +213,9 @@ public class WordSelectionManager : MonoBehaviour
         m_currentCell = cell;
         m_selectedCells.Add(cell);
         cell.HighlightSelected();
+
+        m_wordSearchTitle.GetWordSelectBox().UpdateSelectedWord(cell.GetLetter());
+        m_wordSearchTitle.GetWordSelectBox().UpdatedLettersSelected();
     }
 
     /// <summary>
@@ -239,6 +244,8 @@ public class WordSelectionManager : MonoBehaviour
     {
         m_selectedCells.Clear();
         m_currentCell = null;
+        m_wordSearchTitle.GetWordSelectBox().ClearSelectedWord();
+        m_wordSearchTitle.GetWordSelectBox().ClearLettersSelected();
     }
     #endregion
 
