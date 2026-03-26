@@ -7,12 +7,12 @@ public class GridCanvas : MonoBehaviour
     [SerializeField] private Canvas m_canvas;
 
     [Header("Grid")]
-    [SerializeField] private GridLayoutGroup m_gridPrefab;
-    private GridLayoutGroup m_grid;
+    [SerializeField] private WordSearchGrid m_gridPrefab;
+    private WordSearchGrid                  m_grid;
 
     [Header("Word Search Title Object")]
     [SerializeField] private WordSearchTop m_wordSearchTopPrefab;
-    private WordSearchTop m_wordSearchTop;
+    private WordSearchTop                   m_wordSearchTop;
 
     private Transform       m_gridParent;
     private RectTransform   m_rect;
@@ -26,7 +26,7 @@ public class GridCanvas : MonoBehaviour
         }
 
         m_grid          = Instantiate(m_gridPrefab, m_canvas.transform);
-        m_gridParent    = m_grid.GetComponentInChildren<Transform>();
+        m_gridParent    = m_grid.GetGrid().transform;
         m_rect          = GetComponentInChildren<RectTransform>();
 
         if (m_gridParent == null || m_rect == null)
@@ -79,24 +79,24 @@ public class GridCanvas : MonoBehaviour
 
     public void ResizeGrid(int rows, int cols)
     {
-        RectTransform gridRect = m_grid.GetComponent<RectTransform>();
-        float width = gridRect.rect.width;
-        float height = gridRect.rect.height;
+        RectTransform gridRect  = m_grid.GetGrid().GetComponent<RectTransform>();
+        float width             = gridRect.rect.width;
+        float height            = gridRect.rect.height;
 
         // total spacing between cells
-        float totalSpacingX = m_grid.spacing.x * (cols - 1);
-        float totalSpacingY = m_grid.spacing.y * (rows - 1);
+        float totalSpacingX = m_grid.GetGrid().spacing.x * (cols - 1);
+        float totalSpacingY = m_grid.GetGrid().spacing.y * (rows - 1);
 
         // calculate cell size to fit inside the grid rect
-        float cellWidth = (width - totalSpacingX) / cols;
-        float cellHeight = (height - totalSpacingY) / rows;
+        float cellWidth     = (width - totalSpacingX) / cols;
+        float cellHeight    = (height - totalSpacingY) / rows;
 
         // choose the smaller one to keep square cells
         float size = Mathf.Max(0, Mathf.Min(cellWidth, cellHeight)); // avoid negative size
 
-        m_grid.cellSize = new Vector2(size, size);
+        m_grid.GetGrid().cellSize = new Vector2(size, size);
 
-        m_grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        m_grid.constraintCount = cols;
+        m_grid.GetGrid().constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        m_grid.GetGrid().constraintCount = cols;
     }
 }

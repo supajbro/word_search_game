@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridCanvas
   m_canvas: {fileID: 4998398777183822015}
-  m_gridPrefab: {fileID: 2024632639093035337, guid: 6ad5b10cdd038184189326f994c54515, type: 3}
+  m_gridPrefab: {fileID: 3370115237422785462, guid: 6ad5b10cdd038184189326f994c54515, type: 3}
   m_wordSearchTopPrefab: {fileID: 8433348605113813921, guid: d97d016a6de91de408f02fdc9b2bf290, type: 3}
 --- !u!1 &1149610989934636957
 GameObject:
