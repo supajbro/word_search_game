@@ -11,8 +11,8 @@ public class GridCanvas : MonoBehaviour
     private GridLayoutGroup m_grid;
 
     [Header("Word Search Title Object")]
-    [SerializeField] private WordSearchTitle m_wordSearchTitlePrefab;
-    private WordSearchTitle m_wordSearchTitle;
+    [SerializeField] private WordSearchTop m_wordSearchTopPrefab;
+    private WordSearchTop m_wordSearchTop;
 
     private Transform       m_gridParent;
     private RectTransform   m_rect;
@@ -43,8 +43,8 @@ public class GridCanvas : MonoBehaviour
 
     public void InitWordSearchTitle()
     {
-        m_wordSearchTitle = Instantiate(m_wordSearchTitlePrefab, m_canvas.transform);
-        m_wordSearchTitle.Init();
+        m_wordSearchTop = Instantiate(m_wordSearchTopPrefab, m_canvas.transform);
+        m_wordSearchTop.Init();
     }
 
     public Canvas GetCanvas()
@@ -67,14 +67,14 @@ public class GridCanvas : MonoBehaviour
         return m_gridParent;
     }
 
-    public WordSearchTitle GetWordSearchTitle() 
+    public WordSearchTop GetWordSearchTop() 
     {
-        if (m_wordSearchTitle == null)
+        if (m_wordSearchTop == null)
         {
             Debug.LogError("Missing Word Search Title.");
             return null;
         }
-        return m_wordSearchTitle;
+        return m_wordSearchTop;
     }
 
     public void ResizeGrid(int rows, int cols)

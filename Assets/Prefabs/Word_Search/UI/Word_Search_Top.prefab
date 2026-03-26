@@ -715,7 +715,7 @@ GameObject:
   - component: {fileID: 6202443634404130302}
   - component: {fileID: 3940410203047968338}
   m_Layer: 0
-  m_Name: Word_Search_Title
+  m_Name: Word_Search_Top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

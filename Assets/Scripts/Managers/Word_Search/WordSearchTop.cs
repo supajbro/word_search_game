@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class WordSearchTitle : MonoBehaviour
+public class WordSearchTop : MonoBehaviour
 {
     // The "Words to find: " text.
     [SerializeField] private TextMeshProUGUI m_wordToFindText;

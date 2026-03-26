@@ -209,8 +209,8 @@ public class WordSelectionManager : MonoBehaviour
         m_selectedCells.Add(cell);
         cell.HighlightSelected();
 
-        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().UpdateSelectedWord(cell.GetLetter());
-        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().UpdatedLettersSelected();
+        m_gridCanvas.GetWordSearchTop().GetWordSelectBox().UpdateSelectedWord(cell.GetLetter());
+        m_gridCanvas.GetWordSearchTop().GetWordSelectBox().UpdatedLettersSelected();
     }
 
     /// <summary>
@@ -239,8 +239,8 @@ public class WordSelectionManager : MonoBehaviour
     {
         m_selectedCells.Clear();
         m_currentCell = null;
-        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().ClearSelectedWord();
-        m_gridCanvas.GetWordSearchTitle().GetWordSelectBox().ClearLettersSelected();
+        m_gridCanvas.GetWordSearchTop().GetWordSelectBox().ClearSelectedWord();
+        m_gridCanvas.GetWordSearchTop().GetWordSelectBox().ClearLettersSelected();
     }
     #endregion
 
