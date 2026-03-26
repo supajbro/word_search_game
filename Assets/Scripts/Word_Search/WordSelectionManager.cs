@@ -47,6 +47,8 @@ public class WordSelectionManager : MonoBehaviour
 
     public List<WordEntry> GetWords() { return m_words; }
     public List<WordEntry> GetDebugWords() { return m_debugWords; }
+    public int GetRows() { return m_rows; }
+    public int GetColumns() { return m_cols; }
     public List<GridText> GetSelectedCells() { return m_selectedCells; }
     public Vector2Int[] GetDirections() { return m_directions; }
     public WordSearchGenerator GetWordSearchGenerator() { return m_generator; }
